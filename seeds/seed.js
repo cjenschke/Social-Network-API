@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { User, Thought } = require('./models');
+const { User, Thought } = require('../models');
 
 mongoose.connect('mongodb://127.0.0.1:27017/socialNetworkDB');
 
