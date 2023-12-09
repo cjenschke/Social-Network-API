@@ -73,11 +73,19 @@ router.post('/:thoughtId/reactions', async (req, res) => {
     const thought = await Thought.findByIdAndUpdate(
       req.params.thoughtId,
       { $push: { reactions: req.body } },
-      { new: true }
+      { new: true, runValidators: true }
     );
-    res.json(thought);
+
+    if (!thought) {
+      return res
+        .status(404)
+        .json({ message: 'No thought found with this id!' });
+    }
+    res.json({ message: 'Reaction added successfully', thought });
   } catch (err) {
-    res.status(500).json(err);
+    res
+      .status(500)
+      .json({ message: 'Error adding reaction', error: err.message });
   }
 });
 
@@ -89,9 +97,16 @@ router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
       { $pull: { reactions: { reactionId: req.params.reactionId } } },
       { new: true }
     );
-    res.json(thought);
+    if (!thought) {
+      return res
+        .status(404)
+        .json({ message: 'No thought found with this id!' });
+    }
+    res.json({ message: 'Reaction removed successfully', thought });
   } catch (err) {
-    res.status(500).json(err);
+    res
+      .status(500)
+      .json({ message: 'Error removing reaction', error: err.message });
   }
 });
 
