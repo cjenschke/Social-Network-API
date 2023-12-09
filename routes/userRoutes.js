@@ -52,10 +52,21 @@ router.put('/:id', async (req, res) => {
 //DELETE to remove user by its id
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
-    res.json(deletedUser);
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'No user found with this id!' });
+    }
+
+    //Delete the user's thoughts
+    await Thought.deleteMany({ username: user.username });
+
+    //Now delete the user
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'User and their thoughts successfully deleted' });
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: 'Error deleting use', error: err.message });
   }
 });
 
